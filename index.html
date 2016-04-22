@@ -4,12 +4,48 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
+    <script id="revenue">
+      function main() {
+        return People(
+        ).groupBy(["properties.$initial_referring_domain"], mixpanel.reducer.sum(
+          function(user){
+           var total = 0 
+            _.each(user.properties.$transactions, function(t){
+              total += t.$amount
+            })
+            return total;
+            
+          }
+          )).filter(function(collection){
+            if (collection.key[0] !== null){
+              return collection
+            }
+          }).reduce(mixpanel.reducer.top(10))
+        }
+    </script>
+    
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
   <body class="mixpanel-platform-body">
     <h1>Hello, World!</h1>
     <script>
-      // Run queries and display results here
+      //query for pagevies
+      MP.api.segment('Pageviews', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month'}).done(function(pageViews) {
+        console.log(pageViews.values());
+      //query for search
+      MP.api.segment('Search', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month'}).done(function(search) {
+        console.log(search.values());
+      //query for added to cart
+      MP.api.segment('Add to cart', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month'}).done(function(addToCart) {
+        console.log(addToCart.values());
+      });
+      //query for revenue
+      var revenueScript = $('#revenue').html();
+      revenueScript = $.trim(revenueScript)
+      MP.api.jql(revenueScript).done(function(revenue){
+        console.log(revenue)
+      })
+      
     </script>
   </body>
 </html>

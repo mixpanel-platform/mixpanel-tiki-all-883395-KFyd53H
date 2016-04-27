@@ -150,22 +150,25 @@
     </script>
     <script id="cq-revenue">
       var thisMonth = new Date().toISOString().substring(0,7)
-        function main() {
-          
-          return People(
-          ).groupBy(["properties.$initial_referring_domain"], mixpanel.reducer.numeric_summary(
-            function(user){
-             var total = 0 
-              _.each(user.properties.$transactions, function(t){
-                var transactionDate = t.$time.toISOString().substring(0,7)
-                if ( transactionDate === thisMonth){
-                    total += t.$amount
-                }
-              })
-              return total;
-              
+      function main() {
+        return People(
+        ).groupBy(["properties.$initial_referring_domain"], mixpanel.reducer.sum(
+          function(user){
+           var total = 0 
+            _.each(user.properties.$transactions, function(t){
+              var transactionMonth = t.$time.toISOString().substring(0,7)
+              if(transactionMonth === thisMonth){
+                total += t.$amount
+              }
+            })
+            return total;
+            
+          }
+          )).filter(function(collection){
+            if (collection.key[0] !== null){
+              return collection
             }
-            ))
+          }).reduce(mixpanel.reducer.top(20))
         }
     </script>
     <script id="cq-monthly-active-users">
@@ -179,7 +182,7 @@
       var a = new Date();
       var lastMonth = new Date(a.getFullYear(), a.getMonth()-1, 1).toISOString().split('T')[0];
       params = {
-        "startDate":lastMonth,
+        "startDate":sixMonths,
         "endDate": date
       }
 

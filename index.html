@@ -182,7 +182,7 @@
       var a = new Date();
       var lastMonth = new Date(a.getFullYear(), a.getMonth()-1, 1).toISOString().split('T')[0];
       params = {
-        "startDate":sixMonths,
+        "startDate":lastMonth,
         "endDate": date
       }
 

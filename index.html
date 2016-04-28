@@ -547,6 +547,7 @@
           })
       }
           liveUsers()
+          setTimeout(liveUsers,300000)
     </script>
     <script id='clock'>      
     </script>
@@ -567,80 +568,85 @@
       }
       
 
-      
-      //query for revenue
-      var revenueScript = $('#cq-revenue').html();
-      revenueScript = $.trim(revenueScript)
-      MP.api.jql(revenueScript).done(function(revenue){
-        var revenueSources =[]
+      var revenueQuery = function(){
+          //query for revenue
+        var revenueScript = $('#cq-revenue').html();
+        revenueScript = $.trim(revenueScript)
+        MP.api.jql(revenueScript).done(function(revenue){
+          var revenueSources =[]
 
-        _.each(revenue[0], function(k, i){
-          revenueTrimmed[k.key[0]] = k.value
-          revenueSources.push(k.key[0])
-        })
+          _.each(revenue[0], function(k, i){
+            revenueTrimmed[k.key[0]] = k.value
+            revenueSources.push(k.key[0])
+          })
 
-        //query for pagevies
-        MP.api.segment('Pageviews', '$initial_referring_domain', {from: moment().subtract(1, 'month'), interval: 1, limit: 100}).done(function(pageViews) {
-          //sum last 30 days count
-          pageViewResutls = pageViews.sum().values()
-   
-            //query for search
-          MP.api.segment('Search', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month',limit: 100}).done(function(search) {
+          //query for pagevies
+          MP.api.segment('Pageviews', '$initial_referring_domain', {from: moment().subtract(1, 'month'), interval: 1, limit: 100}).done(function(pageViews) {
             //sum last 30 days count
-            searchResults = search.sum().values()
-          
-            //query for added to cart
-            MP.api.segment('Add to cart', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month', limit: 100}).done(function(addToCart) {
+            pageViewResutls = pageViews.sum().values()
+     
+              //query for search
+            MP.api.segment('Search', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month',limit: 100}).done(function(search) {
               //sum last 30 days count
-              addToCartResults = addToCart.sum().values()
-              //query for checkout
-              MP.api.segment('Checkout', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month', limit: 100}).done(function(checkoutResults) {
-              //sum last 30 days count
-              checkout = checkoutResults.sum().values()
-             
+              searchResults = search.sum().values()
+            
+              //query for added to cart
+              MP.api.segment('Add to cart', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month', limit: 100}).done(function(addToCart) {
+                //sum last 30 days count
+                addToCartResults = addToCart.sum().values()
+                //query for checkout
+                MP.api.segment('Checkout', '$initial_referring_domain', {from: moment().subtract(1, 'month'), unit: 'month', limit: 100}).done(function(checkoutResults) {
+                //sum last 30 days count
+                checkout = checkoutResults.sum().values()
+               
 
-                _.each(revenueSources, function(array){
-                  _.each(pageViewResutls, function(k, i){
-                    var placeholder = []
-                    var averageOrder
-                    if(i === array){
-                      
-                      averageOrder = (revenueTrimmed[i]/checkout[i]).toFixed(0)
-                      averageOrder = addCommas(averageOrder)
+                  _.each(revenueSources, function(array){
+                    _.each(pageViewResutls, function(k, i){
+                      var placeholder = []
+                      var averageOrder
+                      if(i === array){
+                        
+                        averageOrder = (revenueTrimmed[i]/checkout[i]).toFixed(0)
+                        averageOrder = addCommas(averageOrder)
 
-                      placeholder[0] = addCommas(i)
-                      placeholder[1] = addCommas(k)
-                      placeholder[2] = addCommas(searchResults[i])
-                      placeholder[3] = addCommas(addToCartResults[i])
-                      placeholder[4] = addCommas(checkout[i])
-                      placeholder[5] = addCommas(revenueTrimmed[i])
-                      placeholder[6] = averageOrder
-                      data.push(placeholder)
-                   
-                    }
+                        placeholder[0] = addCommas(i)
+                        placeholder[1] = addCommas(k)
+                        placeholder[2] = addCommas(searchResults[i])
+                        placeholder[3] = addCommas(addToCartResults[i])
+                        placeholder[4] = addCommas(checkout[i])
+                        placeholder[5] = addCommas(revenueTrimmed[i])
+                        placeholder[6] = averageOrder
+                        data.push(placeholder)
+                     
+                      }
+                    })
                   })
-                })
-             
-                
+               
+                  
 
-                $('#table').DataTable( {
-                        data: data,
-                        columns:[
-                          {title: "Source"},
-                          {title: "Page Views"},
-                          {title: "Search"},
-                          {title: "Add to Cart"},
-                          {title: "Check out"},
-                          {title: "Revenue"},
-                          {title: "Average Order"}
-                        ],
-                        "order":[[5,"desc"]]
-                });  
-              }) 
-            });
+                  $('#table').DataTable( {
+                          data: data,
+                          columns:[
+                            {title: "Source"},
+                            {title: "Page Views"},
+                            {title: "Search"},
+                            {title: "Add to Cart"},
+                            {title: "Check out"},
+                            {title: "Revenue"},
+                            {title: "Average Order"}
+                          ],
+                          "order":[[5,"desc"]]
+                  });  
+                }) 
+              });
+            })
           })
         })
-      })
+      }
+      revenueQuery();
+      setTimeout(revenueQuery,3600000)
+
+      
     </script>
     <script id='daily-active-users'>
       var dailyActivesQuery = function(){       
@@ -677,6 +683,7 @@
           })
       }
       monthlyQuery();
+      setTimeout(monthlyQuery,3600000)
     </script>
 
     <script id="graphs">
@@ -1156,6 +1163,10 @@
       monthlyQuery()  
       weeklyQuery() 
       dauOverMausQuery() 
+      setTimeout(monthlyQuery,310000)
+      setTimeout(weeklyQuery,320000)
+      setTimeout(dauOverMausQuery,330000)
+
     </script>
 
     
